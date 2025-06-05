@@ -4,6 +4,7 @@
 #include <Windows.h>
 #include <conio.h>
 #include <time.h>
+#include <string.h>
 
 #define HEIGHT 20 //세로
 #define WIDTH 40 //가로
@@ -117,62 +118,51 @@ void make_point(void) {
 }
 
 int n_move_snake(int way) {
-	int ver=0, ho=0;
-	int wall_check_x = 100;
-	int wall_check_y = 100;
-	int check=0;
-	if (way == LEFT) {
-		ver = 0;
-		ho = -1;
-		wall_check_x = 0;
-		wall_check_y = 100;
-		
-	}
-	if (way == RIGHT) {
-		ver = 0;
-		ho = 1;
-		wall_check_x = WIDTH;
-		wall_check_y = 100;
-	}
-	if (way == UP) {
-		ver = -1;
-		ho = 0;
-		wall_check_x = 100;
-		wall_check_y = 0;
-	}
+        int ver = 0, ho = 0;
+        int check = 0;
 
-	if (way == DOWN) {
-		ver = 1;
-		ho = 0;
-		wall_check_x = 100;
-		wall_check_y = HEIGHT;
-	}
-	if (record[move].x == wall_check_x || record[move].y == wall_check_y
-		|| map[(record[move].y)+ver][(record[move].x) + ho] == 1) {//앞에 자기몸
-		move++;
-		life = 1;
-		return 0;
-	}
-	else if (map[(record[move].y)+ver][(record[move].x) + ho] == 2) {//앞에 별있을때
-		map[(record[move].y)+ver][(record[move].x) + ho] = 1;
-		move++;
-		record[move].y = record[move - 1].y + ver;
-		record[move].x = record[move - 1].x + ho;
-		make_point();
-		check++;
-		length++;
-	}
-	else {//앞에 빈칸
-		map[(record[move].y)+ver][(record[move].x) + ho] = 1;
-		move++;
-		record[move].y = record[move - 1].y + ver;
-		record[move].x = record[move - 1].x + ho;
-		delete_tail();
-		check++;
-	}
-	if (check != 0) {
-		head = way;
-	}
+        if (way == LEFT) {
+                ho = -1;
+        }
+        if (way == RIGHT) {
+                ho = 1;
+        }
+        if (way == UP) {
+                ver = -1;
+        }
+        if (way == DOWN) {
+                ver = 1;
+        }
+
+        int next_x = record[move].x + ho;
+        int next_y = record[move].y + ver;
+
+        if (next_x < 0 || next_x >= WIDTH || next_y < 0 || next_y >= HEIGHT ||
+            map[next_y][next_x] == 1) {
+                move++;
+                life = 1;
+                return 0;
+        } else if (map[next_y][next_x] == 2) {
+                map[next_y][next_x] = 1;
+                move++;
+                record[move].y = next_y;
+                record[move].x = next_x;
+                make_point();
+                check++;
+                length++;
+        } else {
+                map[next_y][next_x] = 1;
+                move++;
+                record[move].y = next_y;
+                record[move].x = next_x;
+                delete_tail();
+                check++;
+        }
+        if (check != 0) {
+                head = way;
+        }
+
+        return check;
 }
 
 void game_over(void) {
